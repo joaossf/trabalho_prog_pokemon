@@ -1,3 +1,10 @@
+#**************************************************************************
+#Trabalho Computacional – Introdução à Programação - 2024/2
+#Grupo:
+#Marcus Vinicius Sabec Sanatana
+#<nome completo do Componente 2>
+#**************************************************************************
+
 def distancia_euclid(p1,p2): #função que calcula a distância euclidiana
   return((p1[0] - p2[0]) ** 2 + (p1[1] - p2[1]) ** 2) ** 0.5
 
