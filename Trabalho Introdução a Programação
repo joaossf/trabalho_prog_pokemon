@@ -1,0 +1,117 @@
+#**************************************************************************
+#Trabalho Computacional – Introdução à Programação - 2024/2
+#Grupo:
+#Marcus Vinicius Sabec Sanatana
+#<nome completo do Componente 2>
+#**************************************************************************
+
+def distancia_euclid(p1,p2): #função que calcula a distância euclidiana
+  return((p1[0] - p2[0]) ** 2 + (p1[1] - p2[1]) ** 2) ** 0.5
+
+
+def proximo_ponto(num_coordenadas,coordenadas): #função para calcular o trajeto e a distancia total
+  caminho = [0] #lista que armazena o caminho percorrido, já iniciando pelo ponto 0
+  indices_disponiveis = list(range(1,num_coordenadas)) #lista de indices que ainda não foram tracados no caminho
+  atual = 0 # armazena o indice do ponto atual
+  soma_dist = 0
+
+  while len(indices_disponiveis) > 0:
+    menor_distancia = -1 # armazena a menor distancia
+    proximo_ponto = -1 # armazena qual será o proximo ponto do caminho
+
+    for i in indices_disponiveis:
+      dist = distancia_euclid(coordenadas[atual],coordenadas[i]) # calculo da distância
+
+      if menor_distancia == -1 or dist < menor_distancia: #verificação se é o menor caminho possivel entre p0 e p1
+        menor_distancia = dist  
+        proximo_ponto = i
+    
+    soma_dist += menor_distancia # somo a menor distancia a distancia total
+    caminho.append(proximo_ponto) # adiciono o ponto ao caminho
+    indices_disponiveis.remove(proximo_ponto) # removo o proximo ponto dos indices disponiveis, pois ele já foi percorrido
+    atual = proximo_ponto 
+  
+  soma_dist += distancia_euclid(coordenadas[atual],coordenadas[0]) # adiciono a distancia do ultimo ponto ate o ponto de indice 0 a soma
+  caminho.append(0)
+  
+  return caminho,soma_dist
+
+def Combate(pokemons, hp_original, atk, end):
+# Função responsável pelo combate entre os pokemons
+    vitorias = [0] * len(pokemons) # Aqui cria-se  uma lista que vai ordenar a quantidade de vitorias de cada pokemon comparando o index desta com o index da lista de pokemons
+
+    for pokemonA in range(len(pokemons)):
+        for pokemonB in range(len(pokemons)): 
+            # São 2 "fors" para realizarem a passagem de 2 pokemons em combate, onde o primerio enfrenta todos da lista, para entao o segundo enfrentar novamente o primeiro e o restante da lista
+            if pokemonA == pokemonB: #Um condicional para que um pokemon não enfrente ele mesmo
+                continue  
+            
+            # Aqui se gera uma cópia do hp original para que ele possa ser restaurado após cada combate individual
+            hp_A, hp_B = hp_original[pokemonA], hp_original[pokemonB]
+            # Este é o grande loop de combate entre os pokemons em que se segue a ordenação
+            while hp_A > 0 and hp_B > 0:
+                dano_A = atk[pokemonA] - end[pokemonB]
+                dano_B = atk[pokemonB] - end[pokemonA]
+                # Acima esta o cálculo de dano que se deve a diferença entre o ataque e a defesa
+                if atk[pokemonA] <= end[pokemonB] and atk[pokemonB] <= end[pokemonA]: #Condicional para determinar empates
+                    break
+                hp_B -= dano_A  # Pokemon B recebe dano
+                if hp_B <= 0:  # Pokemon B eh abatido
+                    vitorias[pokemonA] += 1
+                    break  
+
+                hp_A -= dano_B  # Pokemon A recebe dano
+                if hp_A <= 0:  # Pokemon A eh abatido
+                    break  
+
+    # Usamos o Max para pegar o maior número e vitórias dentro da lista
+    max_vitorias = max(vitorias)
+    vencedor = pokemons[vitorias.index(max_vitorias)]  # .index para encontrar o index com o pokemon com o maior numero de vitorias e a partir disso o localizar
+
+    return vencedor, max_vitorias  # Retorna a Main o número de vitorias do pokemon campeao
+
+def main():
+    n_coordenadas = int(input())
+    coordenadas = []
+  
+    for i in range(n_coordenadas):
+        x, y = map(int, input().split())
+        coordenadas.append([x,y])
+
+    caminho, distancia = proximo_ponto(n_coordenadas,coordenadas)
+  
+    string_caminho = ""
+  
+    for i in range(len(caminho)): #for que prepara a string do caminho para o output
+    
+        if i < (len(caminho)-1):
+            string_caminho += (str(caminho[i]) + " ")
+        else:
+            string_caminho += str(caminho[i])
+    
+    pokemons = []
+    hp = []
+    atk = []
+    end = []
+    
+    for _ in range(n_coordenadas-1): # A quantidade de pokemons sempre será do -1 da quantidade de pontos por conta do ponto inicial
+        nome = input()
+        stats = input().split()  # Recebe os status de cada pokemon e separa onde tem espaços formando uma lista onde seus elementos sáo distribuidos individualmente para a lista de cada atributo específico
+        
+        pokemons.append(nome)
+        hp.append(int(stats[0]))
+        atk.append(int(stats[1]))
+        end.append(int(stats[2]))
+
+    vencedor, num_vitorias = Combate(pokemons, hp, atk, end) # Aqui chamamos a função responsável pelo combate a qual retornará o campeão
+
+    print(f"Caminho: {string_caminho}")  
+    print(f"Distancia: {distancia:.6f}")
+    print(f"Campeao: {vencedor}")
+    print(f"Numero de vitorias: {num_vitorias}")
+
+
+
+# Executar a função principal
+if __name__ == "__main__":
+    main()
